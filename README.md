@@ -1,6 +1,6 @@
 # Currency Test Application
 
-Aplikacja zosta³a stworzona z myœl¹ o rekrutacji do firmy **AVENEO**. 
+Aplikacja zostaÅ‚a stworzona z myÅ›lÄ… o rekrutacji do firmy **AVENEO**. 
 Stos technologiczny:
 
  - .NET Core 3.1
@@ -8,39 +8,41 @@ Stos technologiczny:
  - Autofac
  - Automapper
  - EF Core
+ 
 # Architektura
-Architektura systemu jest klasyczn¹ architektur¹ 3-warstowa. Wybór spowodowany typowych schematem dzia³ania klient-serwer. Taka architektura by³a wystarczaj¹ca do zaimplementowania danych, ciê¿ko mówiæ w przypadku tego zadania o jakiœ encjach, których stanem moglibyœmy w jakiœ sposób zarz¹dzaæ.
+Architektura systemu jest klasycznÄ… architekturÄ… 3-warstowÄ…. WybÃ³r takiej architektury spowodowany byÅ‚ charakterystykÄ… problemu, ktÃ³ry naleÅ¼aÅ‚o zaimplementowaÄ‡. MieliÅ›my tutaj do czynienia z aplikacjÄ…, w ktÃ³rej brak byÅ‚o encji, ktÃ³rych stanem mogliÅ›my w jakiÅ› sposÃ³b zarzÄ…dzaÄ‡ (co wymusiÅ‚oby wykorzystanie jakiejÅ› bardziej wyrafinowanej architektury). 
+Zastosowany podziaÅ‚ na warstwÄ™ danych i logiki biznesowej sprawia, Å¼e w doÅ›Ä‡ Å‚atwy i elastyczny sposÃ³b moÅ¼liwe jest skorzystanie z rÃ³Å¼nych systemÃ³w baz danych oraz rÃ³Å¼nych API dostarczajÄ…cych informacje o kursach walut.
 
-Sk³ada siê ona z 3 g³ównych komponentów:
+SkÅ‚ada siÄ™ ona z 3 gÅ‚Ã³wnych komponentÃ³w:
 
- - Api: w którym obs³ugiwane s¹ ¿¹dania u¿ytkowników wraz z generowaniem oraz weryfikacj¹ klucza API.
- - App: w nim znajduje siê ca³a logika biznesowa, zaimplementowany jest mechanizm zbierania danych z zewnêtrznych API oraz z lokalnych danych znajduj¹cych siê w cache,
- - Infrastructure: tutaj znajduj¹ siê funkcjonalnoœci zwi¹zane z dostêpem do danych, zarówno do bazy danych jak równie¿ integracja do zewnêtrznych serwisów, które udostêpniaj¹ te dane.
+ - Api: w ktÃ³rym obsÅ‚ugiwane sÄ… Å¼Ä…dania uÅ¼ytkownikÃ³w wraz z generowaniem oraz weryfikacjÄ… klucza API.
+ - App: w nim znajduje siÄ™ caÅ‚a logika biznesowa, zaimplementowany jest mechanizm zbierania danych z zewnÄ™trznych API oraz z lokalnych danych znajdujÄ…cych siÄ™ w cache,
+ - Infrastructure: tutaj znajdujÄ… siÄ™ funkcjonalnoÅ›ci zwiÄ…zane z dostÄ™pem do danych, zarÃ³wno do bazy danych jak rÃ³wnieÅ¼ integracja do zewnÄ™trznych serwisÃ³w, ktÃ³re udostÄ™pniajÄ… te dane.
  
-Ponadto istnieje mniejsza biblioteka CurrencyApplication.Database, w których zawarte s¹ mapowania encji, definicja DbContextu oraz odpowiednie konfiruguracje po³¹czenie z baz¹ danych. 
+Ponadto istnieje mniejsza biblioteka CurrencyApplication.Database, w ktÃ³rych zawarte sÄ… mapowania encji, definicja DbContextu oraz odpowiednie konfiguracje poÅ‚Ä…czenia z bazÄ… danych. 
 
-# Zewnêtrzne API pobieraj¹ce kursy walut
+# ZewnÄ™trzne API pobierajÄ…ce kursy walut
 
-Skorzysta³em z serwisu [https://exchangeratesapi.io/](https://exchangeratesapi.io/). 
-Aby móc skorzystaæ z implementacji innego API, nale¿y zaimplementowaæ interfejs **IExchangeRateProvider** a nastêpnie zadeklarowaæ jego u¿ycie w kontenerze IOC. 
+SkorzystaÅ‚em z serwisu [https://exchangeratesapi.io/](https://exchangeratesapi.io/). Jest to api Å‚atwe w obsÅ‚udze, zwracajÄ…ce dane w prostej do przetworzenia formie.
+Aby mÃ³c skorzystaÄ‡ z implementacji innego moduÅ‚u dostarczajcego dane z zewnÄ™trznego API, naleÅ¼y zaimplementowaÄ‡ interfejs **IExchangeRateProvider** a nastÄ™pnie zadeklarowaÄ‡ jego uÅ¼ycie w kontenerze IOC. 
 
-# Dostêpne optymalizacje
+# DostÄ™pne optymalizacje
 
-Dane pobierane s¹ z API dopiero w ostatecznoœci. Aby przyspieszyæ odpowiedŸ z serwera, zaimplementowane zosta³y nastêpuj¹ce optymalizacje:
+Dane pobierane sÄ… z API dopiero w ostatecznoÅ›ci. Aby przyspieszyÄ‡ odpowiedÅº z serwera, zaimplementowane zostaÅ‚y nastÄ™pujÄ…ce optymalizacje:
 
- - Zapisywanie pobranych wyników w bazie danych, przy kolejnej próbie odczytania wyniku, bêdzie on najpierw poszukiwany w bazie danych.
- - Cachowanie odpowiedzi na poziomie kontrolera ASP.NET. Jest ona usuwana z cache po up³ywie 1 minuty.  
+ - Zapisywanie pobranych wynikÃ³w w bazie danych, przy kolejnej prÃ³bie odczytania wyniku, bÄ™dzie on najpierw poszukiwany w bazie danych.
+ - Cachowanie odpowiedzi na poziomie kontrolera ASP.NET. Jest ona usuwana z cache po upÅ‚ywie 1 minuty.  
  
- Dodanie (b¹dŸ deaktywacja) optymalizacji - takich jak np. przechowywanie danych w bazie danych w pamiêci (np. Redis) jest doœæ elastyczne. Wystarczy jedynie zaimplementowaæ interfejs **IFetchExchangeRateStep**, za pomoc¹ property Order ustawiæ mu kolejnoœæ wykonania, oraz zarejestrowaæ go w kontenerze. Dziêki temu dany krok wykona siê w odpowiednim momencie.
+ Dodanie (bÄ…dÅº deaktywacja) optymalizacji - takich jak np. przechowywanie danych w bazie danych w pamiÄ™ci (np. Redis) jest doÅ›Ä‡ elastyczne. Wystarczy jedynie zaimplementowaÄ‡ interfejs **IFetchExchangeRateStep**, za pomocÄ… property Order ustawiÄ‡ mu kolejnoÅ›Ä‡ wykonania, oraz zarejestrowaÄ‡ go w kontenerze. DziÄ™ki temu dany krok wykona siÄ™ w odpowiednim momencie.
  Obecna sekwencja operacji:
  
  - Pobranie danych z lokalnej bazy danych
  - Pobranie danych z API
- - Jeœli danych nie ma w API, to wykonujemy ponown¹ próbê, tylko tym razem o 3 dni wiêcej do ty³u, aby trafiæ ostatni¹ zdefiniowan¹ wartoœæ.
+ - JeÅ›li danych nie ma w API, to wykonujemy ponownÄ… prÃ³bÄ™, tylko tym razem o 3 dni wiÄ™cej do tyÅ‚u, aby trafiÄ‡ ostatniÄ… zdefiniowanÄ… wartoÅ›Ä‡.
  
- # Dostêpne endpointy
- - **/api/Login/GetApiKey** - s³u¿¹ca do wygenerowania i pobrania ApiKey
- -  **/api/ExchangeRate/GetExchangeRates**- s³u¿¹ca do pobrania informacji o kursach walut w kontekœcie zakresu dat. Parametry takie jak w opisie zadania ;)
+ # DostÄ™pne endpointy
+ - **/api/Login/GetApiKey** - sÅ‚uÅ¼Ä…ca do wygenerowania i pobrania ApiKey
+ -  **/api/ExchangeRate/GetExchangeRates**- sÅ‚uÅ¼Ä…ca do pobrania informacji o kursach walut w kontekÅ›cie zakresu dat. Parametry takie jak w opisie zadania ;)
 
-W razie wszelkich pytañ/w¹tpliwoœci zapraszam do kontaktu, chêtnie na wszystkie udzielê odpowiedzi.
+W razie wszelkich pytaÅ„/wÄ…tpliwoÅ›ci zapraszam do kontaktu, chÄ™tnie na wszystkie udzielÄ™ odpowiedzi.
  
